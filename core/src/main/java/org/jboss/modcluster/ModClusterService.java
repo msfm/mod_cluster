@@ -76,6 +76,9 @@ public class ModClusterService implements ModClusterServiceMBean, ContainerEvent
         MCMPConnectionListener, ContextFilter {
     public static final int DEFAULT_PORT = 8000;
 
+    // TODO make this option configurable in the modcluster subsystem
+    private static final boolean forceCreatingJvmRoute = Boolean.getBoolean("org.jboss.modcluster.force-create-jvm-route");
+
     private final NodeConfiguration nodeConfig;
     private final BalancerConfiguration balancerConfig;
     private final MCMPHandlerConfiguration mcmpConfig;
@@ -282,8 +285,8 @@ public class ModClusterService implements ModClusterServiceMBean, ContainerEvent
     }
 
     protected void establishJvmRoute(Engine engine) {
-        // Create default jvmRoute if none was specified
-        if (engine.getJvmRoute() == null) {
+        // Create default jvmRoute if none was specified or forceCreatingJvmRoute is set to true
+        if (engine.getJvmRoute() == null || forceCreatingJvmRoute) {
             String jvmRoute = this.mcmpConfig.getJvmRouteFactory().createJvmRoute(engine);
 
             engine.setJvmRoute(jvmRoute);
